@@ -26,7 +26,7 @@ local def = CharacterDef("PC_LYRA",
 
     fight_data = 
     {
-        MAX_HEALTH = 60,
+        MAX_HEALTH = 70,
         ranged_riposte = false,
         actions = 3,
         formation = FIGHTER_FORMATION.FRONT_X,
