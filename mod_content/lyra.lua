@@ -37,7 +37,8 @@ local def = CharacterDef("PC_LYRA",
         behaviour =
         {
             OnInit = function( self, difficulty )
-                self.negotiator:AddModifier( "GRIFTER" )
+                -- self.negotiator:AddModifier( "GRIFTER" )
+                self.negotiator:AddModifier("CONTRACTOR_MENTALITY")
             end,
         }
     },
