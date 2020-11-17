@@ -10,7 +10,7 @@ local def = CharacterDef("PC_LYRA",
     anims = {"anim/weapon_club_promoted_spark_baron.zip"},
     combat_anims = { "anim/med_combat_club_promoted_spark_baron.zip" },
 
-    head = "head_female_merc_02",
+    head = "head_female_farmer_001",
     build = "female_tei_utaro_build",
 
     gender = GENDER.FEMALE,
@@ -45,7 +45,7 @@ local def = CharacterDef("PC_LYRA",
     card_series = { "GENERAL", "LYRA" },
     graft_series = { "GENERAL", "LYRA" },
 
-    hair_colour = 0xCB5D3Cff,
+    hair_colour = 0xCABFB1ff,
     skin_colour = 0xd2a18cff,
     text_colour = 0xd16160FF,
         
