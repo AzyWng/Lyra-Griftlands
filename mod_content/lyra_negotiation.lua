@@ -7,7 +7,7 @@ local CARDS =
 	professionalism =
 	{
 		name = "Professionalism",
-		cost = 1
+		cost = 1,
 		min_persuasion = 1,
 		max_persuasion = 3,
 		flags = CARD_FLAGS.DIPLOMACY,
@@ -17,14 +17,14 @@ local CARDS =
 	aggression =
 	{
 		name = "Aggression",
-		cost = 1
+		cost = 1,
 		min_persuasion = 1,
 		max_persuasion = 4,
 		flags = CARD_FLAGS.HOSTILE,
 		rarity = CARD_RARITY.BASIC,
 	},
 	
-	aggression_plus_provoked
+	aggression_plus_provoked =
 	{
 		name = "Provoked Aggression",
 		desc = "<#UPGRADE>Gain {PROVOKED 1}.</>",
@@ -39,12 +39,11 @@ local CARDS =
 	steadiness =
 	{
 		name = "Steadiness",
-		cost = 1
+		cost = 1,
 		desc = "Apply {1} {COMPOSURE}.",
 		desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self:CalculateComposureText( self.features.COMPOSURE ))
         end,
-		cost = 1,
         	features =
         	{
          	   COMPOSURE = 3,
