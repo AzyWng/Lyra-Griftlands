@@ -29,7 +29,7 @@ AddPlayerCharacter(
         :AddAct{
             id = "LYRAS_ADVENTURE",
             
-            name = "A Contractor's ",
+            name = "Lyra's (Mis)Adventures",
             title = "Lyra In Murder Bay",
             desc = "Lyra tries to find her feet in an unfamiliar land.",
             
@@ -78,10 +78,9 @@ local decks =
 {
     NegotiationDeck("negotiation_basic", "PC_LYRA")
         :AddCards{ 
-            fast_talk = 3,
-            threaten = 3,
-            deflection = 3,
-            bravery = 1,
+            professionalism = 3,
+            aggression = 3,
+            steadiness = 3,
         },
     
     BattleDeck("battle_basic", "PC_LYRA")
@@ -90,7 +89,7 @@ local decks =
             feint = 3,
             uppercut = 1,
             fightdirty = 1,
-            berserk = 1,
+            endingswing = 1,
         },
 }
 
