@@ -212,6 +212,22 @@ local CARDS =
 		        target_self = TARGET_ANY_RESOLVE,
         auto_target = true,
 	},
+	
+	laughing_taunt =
+	{
+		name = "Laughing Taunt",
+		cost = 1,
+		desc = "Consume all of your {PROVOKED} and gain {DOMINANCE} equal to that amount.",
+
+		flags = CARD_FLAGS.MANIPULATE,
+		rarity = CARD_RARITY.UNCOMMON,
+
+		OnPostResolve = function( self, minigame )
+			self.negotiator:AddModifier( "DOMINANCE", self.negotiator:GetModifierStacks("PROVOKED"), self)
+			self.negotiator:RemoveModifier("PROVOKED", self.negotiator:GetModifierStacks("PROVOKED"))
+        end,
+
+	},
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do
