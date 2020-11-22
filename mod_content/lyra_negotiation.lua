@@ -4,7 +4,54 @@ local EVENT = negotiation_defs.EVENT
 
 local CARDS =
 {
-    
+	professionalism =
+	{
+		name = "Professionalism",
+		cost = 1,
+		min_persuasion = 1,
+		max_persuasion = 3,
+		flags = CARD_FLAGS.DIPLOMACY,
+		rarity = CARD_RARITY.BASIC,
+	},
+
+	aggression =
+	{
+		name = "Aggression",
+		cost = 1,
+		min_persuasion = 1,
+		max_persuasion = 4,
+		flags = CARD_FLAGS.HOSTILE,
+		rarity = CARD_RARITY.BASIC,
+	},
+	
+	aggression_plus_provoked =
+	{
+		name = "Provoked Aggression",
+		desc = "<#UPGRADE>Gain {PROVOKED 1}.</>",
+		manual_desc = true,
+		flags = CARD_FLAGS.HOSTILE,
+		features =
+		{
+			PROVOKED = 1
+		},
+	},
+		
+	steadiness =
+	{
+		name = "Steadiness",
+		cost = 1,
+		desc = "Apply {1} {COMPOSURE}.",
+		desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self:CalculateComposureText( self.features.COMPOSURE ))
+        end,
+        	features =
+        	{
+         	   COMPOSURE = 3,
+        	},
+		flags = CARD_FLAGS.MANIPULATE,
+		rarity = CARD_RARITY.BASIC,
+		target_self = TARGET_ANY_RESOLVE,
+	},
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do
