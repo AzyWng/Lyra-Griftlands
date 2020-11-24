@@ -20,10 +20,9 @@ local BATTLE_GRAFTS =
 			hidden = true,
 			event_handlers =
             {
-                [ BATTLE_EVENT.CONDITION_ADDED ] = function( self, fighter, condition, stacks, source )
-                    if fighter == self.owner and condition.ctype == CTYPE.DEBUFF then
-                        self.owner:ApplyDamage(2, self.owner, self)
-                        self.battle:BroadcastEvent( BATTLE_EVENT.GRAFT_TRIGGERED, self.graft )
+                [ BATTLE_EVENT.ON_HIT ] = function( self, fighter, condition, stacks, source )
+                    if target == self and damage > 0 then
+                        self.owner:AddCondition("SCARRED", 1, self)
                     end
                 end
             },
