@@ -256,6 +256,22 @@ local CONDITIONS =
         },
     },
 	
+	CONTRACTORS_EXPERIENCE =
+    {
+        name = "Contractor's Experience",
+        desc = "Each time you take damage, gain one {SCARRED}.",
+        icon = "battle/conditions/evasion.tex",
+
+        event_handlers =
+        {
+            [ BATTLE_EVENT.ON_HIT ] = function( self, battle, attack, hit )
+                if attack:IsTarget( self.owner ) and attack.card:IsAttackCard() then
+                    self.owner:AddCondition("SCARRED", 1, self)
+                end
+            end
+        },
+    },
+	
 	-- ANTICIPATINGFOLLOWUP =
 	-- {
 	-- 	name = "(Anticipating) Follow Up",

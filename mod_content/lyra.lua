@@ -10,7 +10,7 @@ local def = CharacterDef("PC_LYRA",
     anims = {"anim/weapon_club_promoted_spark_baron.zip"},
     combat_anims = { "anim/med_combat_club_promoted_spark_baron.zip" },
 
-    head = "head_female_farmer_001",
+    head = "head_female_guard_002",
     build = "female_tei_utaro_build",
 
     gender = GENDER.FEMALE,
@@ -30,8 +30,13 @@ local def = CharacterDef("PC_LYRA",
         ranged_riposte = false,
         actions = 3,
         formation = FIGHTER_FORMATION.FRONT_X,
+<<<<<<< HEAD
 
         behaviour =
+=======
+		
+		behaviour =
+>>>>>>> refs/remotes/origin/main
         {
             OnActivate = function( self )
                 self.fighter:AddCondition("CONTRACTORS_EXPERIENCE")
@@ -54,7 +59,7 @@ local def = CharacterDef("PC_LYRA",
     graft_series = { "GENERAL", "LYRA" },
 
     hair_colour = 0xCABFB1ff,
-    skin_colour = 0xd2a18cff,
+    skin_colour = 0xDC9D8DFF,
     text_colour = 0xd16160FF,
         
     faction_id = PLAYER_FACTION,
