@@ -63,8 +63,12 @@ local CARDS =
 		rarity = CARD_RARITY.UNCOMMON,
 		
 		OnPostResolve = function( self, minigame )
-			self.negotiator:AddModifier( "DOMINANCE", self.negotiator:GetModifierStacks("PROVOKED"), self)
-			self.negotiator:RemoveModifier("PROVOKED", self.negotiator:GetModifierStacks("PROVOKED"))
+			if self.negotiator:HasModifier("PROVOKED") then 
+				if self.negotiator:GetModifierStacks("PROVOKED") >= 2 then
+					self.negotiator:AddModifier( "DOMINANCE", 2, self)
+					self.negotiator:RemoveModifier("PROVOKED", 2)
+				end
+			end
         end,
         	
 	},

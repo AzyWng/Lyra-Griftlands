@@ -30,6 +30,13 @@ local def = CharacterDef("PC_LYRA",
         ranged_riposte = false,
         actions = 3,
         formation = FIGHTER_FORMATION.FRONT_X,
+
+        behaviour =
+        {
+            OnActivate = function( self )
+                self.fighter:AddCondition("CONTRACTORS_EXPERIENCE")
+            end,
+        },
     },
 
     negotiation_data =

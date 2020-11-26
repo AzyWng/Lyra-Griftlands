@@ -69,7 +69,7 @@ local CARDS =
 		warning_shot =
 	{
 		name = "Warning Shot",
-		anim = "shoot",
+		anim = "laser",
 		rarity = CARD_RARITY.BASIC,
 		desc = "Inflict 2 Impair.",
 		manual_desc = true,
@@ -79,7 +79,7 @@ local CARDS =
 		flags = CARD_FLAGS.RANGED,
 		features =
 		{
-		IMPAIR = 2,
+			IMPAIR = 2,
 		}
 	},
 		warning_shot_plus_aoe =
@@ -125,16 +125,20 @@ local CARDS =
 				end
 		end
 	},
-		ending_swing =
+	ending_swing =
     {
-        name = "Ending Swing",
-        anim = "uppercut",
+		name = "Ending Swing",
+		desc = "Spend all {SCARRED}. Heal 1 and deal 2 bonus damage per {SCARRED}.",
+		anim = "uppercut",
+		icon = "battle/the_sledge.tex",
+		
+		flags = CARD_FLAGS.MELEE,
         rarity = CARD_RARITY.UNCOMMON,
-        desc = "Spend all {SCARRED}. Heal 1 and deal 2 bonus damage per {SCARRED}.",
-        cost = 1,
+		cost = 1,
+		
         min_damage = 3,
         max_damage = 6,
-        flags = CARD_FLAGS.MELEE,
+        
         bonus_damage = 2,
 
         OnPostResolve = function ( self, battle, attack)
@@ -153,7 +157,26 @@ local CARDS =
                 end
             end
         },
-    },
+	},
+	
+	anticipating_blow =
+    {
+		name = "Anticipating Blow",
+		desc = "Gain {ANTICIPATING}.",
+		anim = "uppercut",
+		icon = "battle/stringer.tex",
+		
+        rarity = CARD_RARITY.UNCOMMON,
+		flags = CARD_FLAGS.MELEE,
+		cost = 1,
+		
+        min_damage = 3,
+        max_damage = 6,
+        
+        OnPostResolve = function ( self, battle, attack)
+            self.owner:AddCondition("ANTICIPATING", 1, self)
+        end,
+	},
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do
@@ -189,10 +212,7 @@ local CONDITIONS =
         icon = "battle/conditions/evasion.tex",
         ctype = CTYPE.BUFF,
         apply_sound = "event:/sfx/battle/status/system/Status_Buff_Defend",
-        max_stacks = 99,
-
-        priority = 1, -- before defend
-
+    
         damage_mult = .5,
 
             event_handlers =
@@ -206,12 +226,12 @@ local CONDITIONS =
                             -- add buffs after removing anticipating
                             self.owner:AddCondition("POWER", 1, self)
                             self.owner:AddCondition("RIPOSTE", 1, self)
-							self.owner:AddCondition("ANTICIPATINGFOLLOWUP", 1, self)
+							-- self.owner:AddCondition("ANTICIPATINGFOLLOWUP", 1, self)
                         end
                     end
                 end,
                 [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-                if target == self.owner and (self.ignore == nil or card ~= self.ignore) then
+                if target == self.owner then
                     dmgt:ModifyDamage( math.round( dmgt.min_damage * self.damage_mult ),
                                        math.round( dmgt.max_damage * self.damage_mult ),
                                        self )
@@ -219,6 +239,22 @@ local CONDITIONS =
             end
 			},
 	},
+
+	CONTRACTORS_EXPERIENCE =
+    {
+        name = "Contractor's Experience",
+        desc = "Each time you take damage, gain one {SCARRED}.",
+		icon = "battle/conditions/spree_rage.tex",
+       
+        event_handlers =
+        {
+			[ BATTLE_EVENT.ON_HIT ] = function( self, battle, attack, hit )
+				if attack:IsTarget( self.owner ) and attack.card:IsAttackCard() then
+					self.owner:AddCondition("SCARRED", 1, self)
+				end
+            end
+        },
+    },
 	
 	-- ANTICIPATINGFOLLOWUP =
 	-- {
