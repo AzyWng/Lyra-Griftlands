@@ -48,7 +48,7 @@ local CARDS =
 		icon = "negotiation/deflection.tex",
 	},
 	
-		the_contract =
+	the_contract =
 	{
 		name = "The Contract",
 		desc = "{IMPROVISE} from a pool of unique cards.",
@@ -137,25 +137,28 @@ local CARDS =
 		cost = 0,
 		flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
 		rarity = CARD_RARITY.UNIQUE,
-		
-		money_cost = 25,		
-		
-		target_enemy = TARGET_ANY_RESOLVE,
 
-		CanTarget = function( self, target )
-            if target and target.modifier_type == MODIFIER_TYPE.CORE then
-                return false, CARD_PLAY_REASONS.INVALID_TARGET
-            end
-            return true
-        end,
+		target_mod = TARGET_MOD.RANDOM1,
+		target_enemy = TARGET_FLAG.ARGUMENT,
 		
-        OnPostResolve = function( self, minigame, targets )
-            self.engine:ModifyMoney( self.money )
+		-- money_cost = 25,		
+
+		-- CanTarget = function( self, target )
+        --     if target and target.modifier_type == MODIFIER_TYPE.CORE then
+        --         return false, CARD_PLAY_REASONS.INVALID_TARGET
+        --     end
+        --     return true
+        -- end,
+		
+		OnPostResolve = function( self, minigame, targets)
+			-- local target_negotiators = {}
+			-- minigame:CollectRandomTargets(target_negotiators, self.negotiator:Get)
+
 			for i,target in ipairs(targets) do
 				local cur, max = target:GetResolve()
-                target.negotiator:RemoveModifier(target, target.stacks, self)
-				self.negotiator:CreateModifier("PROVOKED", max, self)
-            end
+				target.negotiator:RemoveModifier(target, target.stacks, self)
+				self.negotiator:CreateModifier("PROVOKED", math.round(max / 2), self)
+			end
 		end
 	},
 	
@@ -204,20 +207,16 @@ local CARDS =
 			
             if self.negotiator:HasModifier("PROVOKED") then 
 				if self.negotiator:GetModifierStacks("PROVOKED") >= 2 then
-					
 					if self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain >= self.money then
 						-- gain shills
 						self.engine:ModifyMoney( self.money )
 
 						-- update max shill variable
 						self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain = self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain - self.money
-
-						-- add/remove modifiers
-						self.negotiator:AddModifier( "DOMINANCE", 2, self)
-                    	self.negotiator:RemoveModifier("PROVOKED", 2)
 					end
-
-					
+					-- add/remove modifiers
+					self.negotiator:AddModifier( "DOMINANCE", 2, self)
+					self.negotiator:RemoveModifier("PROVOKED", 2)
                 end
             end
         end,
