@@ -11,7 +11,7 @@ AddPlayerCharacter(
 
             name = "Lyra Concept",
             title = "The Contractor",
-            desc = "A contractor dealing with guilt and getting used to a new world.",
+            desc = "A fish out of water, trying to make a bigger splash than the rest.",
             advancement = DEFAULT_ADVANCEMENT,
 
             -- vo = "event:/vo/narrator/character/sal",
@@ -29,9 +29,9 @@ AddPlayerCharacter(
         :AddAct{
             id = "LYRAS_ADVENTURE",
             
-            name = "Lyra's (Mis)Adventures",
+            name = "The Missing Tools",
             title = "Lyra In Murder Bay",
-            desc = "Lyra tries to find her feet in an unfamiliar land.",
+            desc = "Lyra settles scores, repays debts, and searches for a package.",
             
             act_image = engine.asset.Texture("UI/char_1_campaign.tex"),
             colour_frame = "0xFFDE5Aff",
@@ -61,7 +61,7 @@ AddPlayerCharacter(
             end,
 
             starting_fn = function( agent, game_state) 
-                agent:DeltaMoney( 50 )
+                agent:DeltaMoney( 0 )
             end,
         })
 
@@ -78,18 +78,18 @@ local decks =
 {
     NegotiationDeck("negotiation_basic", "PC_LYRA")
         :AddCards{ 
-            professionalism = 3,
-            aggression = 3,
-            steadiness = 3,
+            lyra_professionalism = 3,
+            lyra_aggression = 2,
+            lyra_steadiness = 3,
+			lyra_the_contract = 1,
         },
     
     BattleDeck("battle_basic", "PC_LYRA")
         :AddCards{ 
-            stab = 2,
+            lyra_wrench_swing = 3,
             feint = 3,
-            uppercut = 1,
-            fightdirty = 1,
-            endingswing = 1,
+            lyra_contractors_fighting = 1,
+			lyra_snap_shot = 1,
         },
 }
 
