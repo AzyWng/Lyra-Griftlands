@@ -4,7 +4,7 @@ local EVENT = negotiation_defs.EVENT
 
 local CARDS =
 {
-	lyra_professionalism =
+	professionalism =
 	{
 		name = "Professionalism",
 		cost = 1,
@@ -16,7 +16,7 @@ local CARDS =
 		icon = "negotiation/fast_talk.tex",
 	},
 
-	lyra_aggression =
+	aggression =
 	{
 		name = "Aggression",
 		cost = 1,
@@ -28,7 +28,7 @@ local CARDS =
 		icon = "negotiation/threaten.tex",
 	},
 		
-	lyra_steadiness =
+	steadiness =
 	{
 		name = "Steadiness",
 		cost = 1,
@@ -48,19 +48,20 @@ local CARDS =
 		icon = "negotiation/deflection.tex",
 	},
 	
-	lyra_the_contract =
+	the_contract =
 	{
 		name = "The Contract",
-		cost = 1,
-		desc = "{IMPROVISE} a card from a pool of special cards.",
+		desc = "{IMPROVISE} from a pool of unique cards.",
 		flavour = "'Where I'm from, contracts are everything.'",
-		manual_desc = true,
+		icon = "negotiation/a_hot_tip.tex",
+
+		cost = 1,
 		flags = CARD_FLAGS.MANIPULATE,
 		rarity = CARD_RARITY.BASIC,
-		icon = "negotiation/a_hot_tip.tex",
+		
 		pool_size = 3,
 		
-		pool_cards = {"lyra_improvise_upfront_fee", "lyra_improvise_clear_violation", "lyra_improvise_reexamine", "lyra_improvise_financial_security", "lyra_improvise_refine_agreement", "lyra_improvise_corrections", },
+		pool_cards = {"improvise_upfront_fee", "improvise_clear_violation", "improvise_reexamine", "improvise_financial_security", "improvise_refine_agreement", "improvise_corrections", },
 		
 		OnPostResolve = function( self, minigame, targets)
             local cards = ObtainWorkTable()
@@ -74,80 +75,100 @@ local CARDS =
         end,
 	},
 	
-	lyra_improvise_upfront_fee =
+	improvise_upfront_fee =
 	{
 		name = "Upfront Fee",
-		cost = 0,
 		desc = "Gain 10 shills.",
 		flavour = "'Just a little something to help grease the wheels, you know?'",
-		manual_desc = true,
+		icon = "negotiation/degrading_nepotism.tex",
+
+		cost = 0,
 		flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
 		rarity = CARD_RARITY.UNIQUE,
-		icon = "negotiation/degrading_nepotism.tex",
+		
 		min_persuasion = 2,
 		max_persuasion = 3,
 		money = 10,
+
 		OnPostResolve = function( self )
-            self.engine:ModifyMoney( self.money )
+			if self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain >= self.money then
+				-- gain shills
+				self.engine:ModifyMoney( self.money )
+				
+				-- update max shill variable
+				self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain = self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain - self.money
+			end
         end,
 	},
 	
-	lyra_improvise_refine_agreement =
+	improvise_refine_agreement =
 	{
 		name = "Refine Agreement",
-		cost = 0,
 		desc = "Gain 10 shills.",
 		flavour = "'There's always room to negotiate. That's the beauty of the contract.'",
-		manual_desc = true,
+		icon = "negotiation/observation.tex",
+
+		cost = 0,
 		flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
 		rarity = CARD_RARITY.UNIQUE,
-		icon = "negotiation/observation.tex",
+		
 		min_persuasion = 0,
 		max_persuasion = 4,
 		money = 10,
+
 		OnPostResolve = function( self )
-            self.engine:ModifyMoney( self.money )
+			if self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain >= self.money then
+				-- gain shills
+				self.engine:ModifyMoney( self.money )
+				
+				-- update max shill variable
+				self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain = self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain - self.money
+			end
         end,
 	},
 	
-	lyra_improvise_clear_violation =
+	improvise_clear_violation =
 	{
 		name = "Clear Violation",
-		cost = 0,
 		desc = "Remove a random enemy argument. Gain Provoked equal to half its maximum resolve.",
 		flavour = "'Yeah, Clauses 2, 37, and Turqouise-Alfa all mention that you can't do that.",
-		manual_desc = true,
+		icon = "negotiation/debate.tex",
+
+		cost = 0,
 		flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
 		rarity = CARD_RARITY.UNIQUE,
-		icon = "negotiation/debate.tex",
-		money_cost = 25,		
-		
-		target_enemy = TARGET_ANY_RESOLVE,
 
-		CanTarget = function( self, target )
-            if target and target.modifier_type == MODIFIER_TYPE.CORE then
-                return false, CARD_PLAY_REASONS.INVALID_TARGET
-            end
-            return true
-        end,
+		target_mod = TARGET_MOD.RANDOM1,
+		target_enemy = TARGET_FLAG.ARGUMENT,
 		
-        OnPostResolve = function( self, minigame, targets )
-            self.engine:ModifyMoney( self.money )
+		-- money_cost = 25,		
+
+		-- CanTarget = function( self, target )
+        --     if target and target.modifier_type == MODIFIER_TYPE.CORE then
+        --         return false, CARD_PLAY_REASONS.INVALID_TARGET
+        --     end
+        --     return true
+        -- end,
+		
+		OnPostResolve = function( self, minigame, targets)
+			-- local target_negotiators = {}
+			-- minigame:CollectRandomTargets(target_negotiators, self.negotiator:Get)
+
 			for i,target in ipairs(targets) do
 				local cur, max = target:GetResolve()
-                    target.negotiator:RemoveModifier(target, target.stacks, self)
-					self.negotiator:CreateModifier("PROVOKED", max, self)
-                end
-            end
+				target.negotiator:RemoveModifier(target, target.stacks, self)
+				self.negotiator:CreateModifier("PROVOKED", math.round(max / 2), self)
+			end
+		end
 	},
 	
-	lyra_improvise_reexamine =
+	improvise_reexamine =
 	{
 		name = "Re-examine",
-		cost = 0,
 		desc = "Gain 1 {PROVOKED}. Play {the_contract} again.",
 		flavour = "'Yes, go over it again! You do not want to mess this up!",
-		manual_desc = true,
+
+		cost = 0,
 		money_cost = 5,
 		
 		features =
@@ -159,7 +180,7 @@ local CARDS =
 		rarity = CARD_RARITY.UNIQUE,
 		icon = "negotiation/night_shift.tex",
 		
-		        OnPostResolve = function( self, minigame, target )
+		OnPostResolve = function( self, minigame, target )
             local card = Negotiation.Card("the_contract", self.owner)
             card.show_dealt = false
             card.generation = (self.generation or 0) + 1
@@ -169,7 +190,7 @@ local CARDS =
         end,
 	},
 	
-	lyra_improvise_corrections =
+	improvise_corrections =
 	{
 		name = "Corrections",
 		cost = 0,
@@ -183,56 +204,70 @@ local CARDS =
 		icon = "negotiation/abrupt_remark.tex",
 		
 		OnPostResolve = function( self, minigame )
+			
             if self.negotiator:HasModifier("PROVOKED") then 
-                if self.negotiator:GetModifierStacks("PROVOKED") >= 2 then
-                    self.engine:ModifyMoney( self.money )
+				if self.negotiator:GetModifierStacks("PROVOKED") >= 2 then
+					if self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain >= self.money then
+						-- gain shills
+						self.engine:ModifyMoney( self.money )
+
+						-- update max shill variable
+						self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain = self.negotiator:FindModifier("CONTRACTOR_MENTALITY").max_shill_gain - self.money
+					end
+					-- add/remove modifiers
 					self.negotiator:AddModifier( "DOMINANCE", 2, self)
-                    self.negotiator:RemoveModifier("PROVOKED", 2)
+					self.negotiator:RemoveModifier("PROVOKED", 2)
                 end
             end
         end,
 	},
 	
-	lyra_improvise_financial_security =
+	improvise_financial_security =
 	{
 		name = "Financial Security",
-		cost = 0,
 		desc = "Apply 3 {COMPOSURE} to all friendly arguments.",
 		flavour = "'Of course I won't act against you. If I was going to, why would I be giving you all this money?'",
-		manual_desc = true,
 		icon = "negotiation/empathy.tex",
+
+		cost = 0,
 		money_cost = 10,
-		features =
-			{
-				COMPOSURE = 3,
-			},
+
 		rarity = CARD_RARITY.UNIQUE,
 		flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
 		target_mod = TARGET_MOD.TEAM,
-		        target_self = TARGET_ANY_RESOLVE,
+
+		target_self = TARGET_ANY_RESOLVE,
         auto_target = true,
+
+		features =
+		{
+			COMPOSURE = 3,
+		},
 	},
 	
-	lyra_laughing_taunt =
+	laughing_taunt =
 	{
 		name = "Laughing Taunt",
 		cost = 1,
 		desc = "Consume all of your {PROVOKED} and gain {DOMINANCE} equal to that amount.",
-		flavour = "'Heh, good one. Wait, you're serious? HAHAHAHAHAHA!'",
 
 		flags = CARD_FLAGS.MANIPULATE,
 		rarity = CARD_RARITY.UNCOMMON,
-
+		
 		OnPostResolve = function( self, minigame )
-			self.negotiator:AddModifier( "DOMINANCE", self.negotiator:GetModifierStacks("PROVOKED"), self)
-			self.negotiator:RemoveModifier("PROVOKED", self.negotiator:GetModifierStacks("PROVOKED"))
+			if self.negotiator:HasModifier("PROVOKED") then 
+				if self.negotiator:GetModifierStacks("PROVOKED") >= 2 then
+					self.negotiator:AddModifier( "DOMINANCE", 2, self)
+					self.negotiator:RemoveModifier("PROVOKED", 2)
+				end
+			end
         end,
-
+        	
 	},
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do
-	carddef.series = carddef.series or "LYRA"
+	carddef.series = "LYRA"
     Content.AddNegotiationCard( id, carddef )
 end
 
@@ -244,8 +279,9 @@ local MODIFIERS =
         desc = "When Lyra's core argument is attacked from any source, gain 1 Provoked.",
 
         modifier_type = MODIFIER_TYPE.CORE,
-		icon = "negotiation/modifiers/deadline.tex",
-        target_self = TARGET_FLAG.ARGUMENT,
+		target_self = TARGET_FLAG.ARGUMENT,
+		
+		max_shill_gain = 50,
 
         event_handlers =
         {
@@ -273,9 +309,7 @@ local MODIFIERS =
         min_persuasion = 1,
         max_persuasion = 1,
         
-		icon = "negotiation/modifiers/heated.tex",
-        
-		event_handlers = 
+        event_handlers = 
         {
             [ EVENT.END_PLAYER_TURN ] = function( self, minigame, negotiator )
                 self:ApplyPersuasion(self.min_persuasion, self.max_persuasion)
