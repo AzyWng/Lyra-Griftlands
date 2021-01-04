@@ -17,7 +17,7 @@ local CARDS =
 		cost = 1,
 		flags = CARD_FLAGS.MELEE,
 		
-		min_damage = 2,
+		min_damage = 1,
 		max_damage = 5,
 	},
 	
@@ -28,67 +28,6 @@ local CARDS =
 		OnPostResolve = function( self, battle, attack )
 		attack:AddCondition("MAULED", 2, self)
 		end
-	},
-	
-	lyra_wrench_swing_plus_min_damage =
-	{
-		name = "Rooted Wrench Swing",
-		min_damage = 4,
-	},
-	
-	lyra_wrench_swing_plus_destroy =
-	{
-		name = "Clarity Wrench Swing",
-		min_damage = 8,
-		max_damage = 8,
-		flags = CARD_FLAGS.MELEE | CARD_FLAGS.CONSUME,
-	},
-	
-	lyra_wrench_swing_plus_expend =
-	{
-		name = "Lucid Wrench Swing",
-		min_damage = 5,
-		max_damage = 7,
-		flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
-	},
-	
-	lyra_wrench_swing_plus_scarred =
-	{
-		name = "Contractor's Wrench Swing",
-		OnPostResolve = function( self, battle, attack, hit )
-                for i, hit in attack:Hits() do
-					if not attack:CheckHitResult( hit.target, "evaded" ) then
-						self.owner:AddCondition("SCARRED", 2 or 0, self)
-					end
-				end
-		end
-	},
-	
-	lyra_wrench_swing_plus_draw_card =
-	{
-		name = "Wrench Swing of Vision",
-		
-		OnPostResolve = function( self, battle, attack)
-            battle:DrawCards( 1 )
-        end,
-	},
-	
-	lyra_wrench_swing_plus_defense =
-	{
-		name = "Stone Wrench Swing",
-
-        features =
-        {        
-            DEFEND = 2,
-        },
-	},
-	
-	lyra_wrench_swing_plus_multihit =
-	{
-		name = "Mirrored Wrench Swing",
-		max_damage = 4,
-		
-		hit_count = 2,
 	},
 	
 	lyra_snap_shot =
@@ -104,80 +43,31 @@ local CARDS =
 		max_damage = 3,
 	},
 	
-	-- lyra_snap_shot_plus_maimed =
-	-- {
-	
-	-- lyra_violent_opportunism =
-	-- {
-		-- name = "Violent Opportunism",
-		-- anim = "slice",
-		-- rarity = CARD_RARITY.UNCOMMON,
-		-- flavour = "'It doesn't have to hit hard - it just has to hit.'",
-		-- desc = "Attack twice. If target has {MAULED}, insert 2 {lyra_violent_opportunism_followup} {2*card|cards} into your hand.",
-
-		-- icon = "battle/jab.tex",
-		-- cost = 0,
-		-- flags = CARD_FLAGS.MELEE,
-		
-		-- min_damage = 1,
-		-- max_damage = 1,
-		-- hit_count = 2,
-		-- num_cards = 2,
-
-		-- OnPostResolve = function( self, battle, attack )
-			-- if card == self and target and target:HasCondition("MAULED") then
-			-- local cards = {}
-            -- for i = 1, self.num_cards do
-                -- local incepted_card = Battle.Card( "blade_flash", self:GetOwner() )
-                -- table.insert( cards, incepted_card )
-			-- end
-            -- battle:DealCards( cards, battle:GetHandDeck() )
-		-- end,
-	-- },
-	
-	-- lyra_violent_opportunism_followup =
-	-- {
-		-- name = "Violent Followup",
-		-- anim = "attack1",
-		-- rarity = CARD_RARITY.UNIQUE,
-		-- flavour = "Now's your chance.",
-		-- desc = "Can only target enemies that have {MAULED}.",
-		-- icon = "battle/jab.tex",
-		-- cost = 0,
-		-- flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
-		-- min_damage = 1,
-		-- max_damage = 1,
-		-- hit_count = 2,
-		
-		-- loc_strings =
-		-- {
-			-- HAS_NO_MAULED = "Target has no Mauled",
-		-- },
-		
-        -- CanPlayCard = function( self, battle, target )
-            -- if target and not target:HasCondition("MAULED") then
-                -- return false, self.def:GetLocalizedString("HAS_NO_MAULED")
-            -- end
-            -- return true
-        -- end,
-	
-	lyra_endurance =
+	lyra_violent_opportunism =
 	{
-		name = "Endurance",
-		anim = "taunt",
-		rarity = CARD_RARITY.BASIC,
-		desc = "Apply {1} {DEFEND}.",
-		flavour = "'You've survived worse. Much worse.'",
-        target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
-        cost = 1,
-        max_xp = 6,
-        flags = CARD_FLAGS.SKILL,
-        wild = true,
-        defend_amount = 3,
+		name = "Violent Opportunism",
+		anim = "slice",
+		rarity = CARD_RARITY.UNCOMMON,
+		flavour = "'It doesn't have to hit hard - it just has to hit.'",
+		desc = "Attack twice. If target has {MAULED}, hit four times.",
 
-        OnPostResolve = function( self, battle, attack )
-            attack:AddCondition( "DEFEND", self.defend_amount, self )
-        end
+		icon = "battle/jab.tex",
+		cost = 0,
+		flags = CARD_FLAGS.MELEE,
+		
+		min_damage = 1,
+		max_damage = 1,
+		hit_count = 2,
+		
+		event_handlers =
+		{
+		 [ BATTLE_EVENT.CALC_HIT_COUNT ] = function( self, acc, card, target )
+                if card == self and target and target:HasCondition("MAULED") then
+					self.hit_count = 4
+					else self.hit_count = 2
+                end
+            end
+		}
 	},
 	
 	lyra_wrench_rush =
@@ -284,7 +174,7 @@ local CARDS =
 
         pool_size = 3,
 
-        pool_cards = {"lyra_improvise_caltrops", "lyra_improvise_smoke_bomb", "lyra_improvise_takedown",},
+        pool_cards = {"lyra_improvise_caltrops",},
 
         OnPostResolve = function( self, battle, attack)
             local cards = ObtainWorkTable()
@@ -302,7 +192,7 @@ local CARDS =
 	{
 		name = "Caltrops",
 		anim = "taunt",
-		desc = "Gain {2} {DEFEND}. Gain 2 {RIPOSTE}.",
+		desc = "Gain 2 {RIPOSTE}.",
 		cost = 0,
 		rarity = CARD_RARITY.UNIQUE,
 		flavour = "'Just make sure the bag you're storing 'em in is tough. And that you wear good gloves.'",
@@ -310,64 +200,8 @@ local CARDS =
         {
             RIPOSTE = 2,
         },
-        defend_amount = 2,
-
-        OnPostResolve = function( self, battle, attack )
-            attack:AddCondition( "DEFEND", self.defend_amount, self )
-        end
 	},
 	
-		lyra_improvise_smoke_bomb =
-	{
-		name = "Smoke Bomb",
-		anim = "taunt",
-		desc = "Gain 2 {ANTICIPATING}.",
-		icon = "battle/throw_dust.tex",
-		cost = 0,
-		rarity = CARD_RARITY.UNIQUE,
-		flavour = "'Always have one of these handy. Pocket sand is for rookies.'",
-		OnPostResolve = function( self, battle )
-			self.owner:AddCondition("ANTICIPATING", 1, self)
-		end
-	},
-	
-		lyra_improvise_takedown =
-	{
-		name = "Takedown",
-		anim = "attack1",
-		desc = "Apply 2 {MAIMED}.",
-		icon = "battle/tackle.tex",
-		cost = 0,
-		rarity = CARD_RARITY.UNIQUE,
-		flavour = "'Get 'em on the ground, and they'll still be reeling for a few moments.'",
-
-				OnPostResolve = function( self, battle, attack, hit )
-                for i, hit in attack:Hits() do
-					if not attack:CheckHitResult( hit.target, "evaded" ) then
-						attack:AddCondition("MAIMED", 2, self)
-					end
-				end
-		end
-	},
-	
-		lyra_improvise_throw_wrench =
-	{
-		name = "Throw Wrench",
-		anim = "Attack1",
-		desc = "Apply 2 {MAULED}.",
-		icon = "battle/force_wrench.tex",
-		cost = 0,
-		rarity = CARD_RARITY.UNIQUE,
-		flavour = "'Enough strength and it may as well be a javelin you're throwing.'",
-				OnPostResolve = function( self, battle, attack, hit )
-                for i, hit in attack:Hits() do
-					if not attack:CheckHitResult( hit.target, "evaded" ) then
-						attack:AddCondition("MAULED", 2, self)
-					end
-				end
-		end
-	},
-
 		lyra_old_pain =
 	{	
 		name = "Old Pain",
@@ -396,7 +230,6 @@ local CARDS =
 		lyra_old_pain_plus_scarred =
 	{
 		name = "Fresh Pain",
-		desc = "Gain {SCARRED} equal to damage dealt by this card.",
 		OnPostResolve = function( self, battle, attack, hit )
 				for i, hit in attack:Hits() do
 					if not attack:CheckHitResult( hit.target, "evaded" ) then
@@ -422,8 +255,8 @@ local CARDS =
 		
 		cost = 1,
 		
-		min_damage = 4,
-		max_damage = 4,
+		min_damage = 3,
+		max_damage = 3,
 		
 		bonus_damage = 1,
 		
@@ -440,14 +273,14 @@ local CARDS =
         },
     },
 	
-	lyra_schadenfreude =
+		lyra_messy_harvest =
 	{
-		name = "Schadenfreude",
+		name = "Messy Harvest",
 		rarity = CARD_RARITY.COMMON,
 		anim = "trip",
 		desc = "Heal 1 damage for every {WOUND} and {MAULED} the target has.",
 		cost = 1,
-		flavour = "Eventually, you start to enjoy what you do to other people.",
+		flavour = "'Is she trying to tear out his... oh Hesh, I think I'm gonna be sick.'",
 		flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
 		icon = "battle/ravenous.tex",
 		
@@ -458,218 +291,14 @@ local CARDS =
 					end
                 end
             end
-	},
-	
-	lyra_automatic_rifle =
-	{
-		name = "Lyra's Auto Rifle",
-		rarity = CARD_RARITY.UNIQUE,
-		anim = "shoot",
-		desc = "Insert {lyra_full_auto} or {lyra_fuller_auto} into your hand.",
-		flavour = "Most folk prefer to swap from gun to gun, but full-auto can have its uses.",
-		flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
-		cost = 1,
-		target_mod = TARGET_MOD.TEAM,
-		
-        OnPostResolve = function( self, battle, attack)
-            local cards = {
-                Battle.Card( "lyra_full_auto", self.owner ),
-                Battle.Card( "lyra_fuller_auto", self.owner ),
-            }
-            battle:ChooseCardsForHand( cards )
-        end,
-	},
-	
-	lyra_full_auto =
-	{
-		name = "Full Auto",
-		rarity = CARD_RARITY.UNIQUE,
-		anim = "shoot",
-		desc = "Attack 3 times.",
-		flavour = "Efficient. Also helps save on ammo.",
-		flags = CARD_FLAGS.RANGED | CARD_FLAGS.PIERCING | CARD_FLAGS.EXPEND,
-		cost = 0,
-		min_damage = 3,
-		max_damage = 3,
-		hit_count = 3,
-	},
-	
-	lyra_fuller_auto =
-	{
-		name = "Fuller Auto",
-		rarity = CARD_RARITY.UNIQUE,
-		anim = "shoot",
-		desc = "Attack 6 times.",
-		flavour = "For when you really need to bring the pain. Just don't drop it.",
-		flags = CARD_FLAGS.RANGED | CARD_FLAGS.PIERCING | CARD_FLAGS.EXPEND,
-		cost = 0,
-		min_damage = 2,
-		max_damage = 2,
-		hit_count = 6,
-		features =
-		{
-			EXERT = 1,
-		},
-	},
-	
-	lyra_pistols =
-	{
-		name = "Lyra's Pistols",
-		rarity = CARD_RARITY.UNIQUE,
-		anim = "taunt",
-		desc = "Discard any number of cards, then fill your hand with {lyra_pistol_shot}.",
-		flavour = "Cheap, light, and readily available, as is the ammunition. Why carry one when you can carry ten?",
-		flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
-		cost = 1,
-		target_mod = TARGET_MOD.TEAM,
-		
-        OnPostResolve = function( self, battle, attack )
-			local cards = {}
-			battle:DiscardCards()
-            local count = battle:GetHandDeck():GetMaxSize() - battle:GetHandDeck():CountCards()
-            for i = 1, count do
-                local card = Battle.Card( "lyra_pistol_shot", self.owner )
-                if self.upgraded then
-                    card:UpgradeCard()
-                end
-                card:SetFlags( CARD_FLAGS.FREEBIE )
-                card:ClearXP()
-                card:MakeTemporary()
-                table.insert( cards, card )
-            end
-            battle:DealCards( cards, battle:GetHandDeck() )
-        end,
-	},
-	
-	lyra_pistol_shot =
-	{
-		name = "Pistol Shot",
-		rarity = CARD_RARITY.UNIQUE,
-		anim = "shoot",
-		flavour = "'Shoot and drop it. The time between shots is too long to do anything more.'",
-		flags = CARD_FLAGS.RANGED | CARD_FLAGS.EXPEND,
-		cost = 0,
-		
-		min_damage = 1,
-		max_damage = 1,
-	},
-	
-	lyra_rapid_tossing =
-	{
-		name = "Rapid Tossing",
-		rarity = CARD_RARITY.UNCOMMON,
-		anim = "taunt",
-		desc = "Ability: When you {DISCARD} or {EXPEND} a card, apply 1 {TRAUMA} to a random enemy.",
-		icon = "battle/right_in_the_face.tex",
-		flavour = "'When you're done with something, be sure to toss it in your target's face. It's only polite!'",
-		flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
-		cost = 2,
-		target_type = TARGET_TYPE.SELF,
-		
-        OnPostResolve = function( self, battle, attack)
-            local con = self.owner:AddCondition( "lyra_rapid_tossing", 1, self )
-				if con then
-					con.ignore_card = self
-					end
-				end,
-		
-		condition =
-		{   
-			desc = "Whenever you discard or expend a card, apply {1} {TRAUMA} to a random enemy.",
-            desc_fn = function( self, fmt_str )
-                return loc.format(fmt_str, self.trauma_amt * self.stacks)
-            end,
-
-            trauma_amt = 1,
-		
-			Trigger = function( self, battle )
-                local target_fighters = {}
-                battle:CollectRandomTargets( target_fighters, self.owner:GetEnemyTeam().fighters, 1 )
-
-                for i=1, #target_fighters do
-                    hit.target:AddCondition("TRAUMA", self.trauma_amt, self)
-                end
-            end,
-
-            event_handlers =
-            {
-                [ BATTLE_EVENT.CARD_DISCARDED ] = function( self, card, battle )
-                    self:Trigger( battle )
-                end,
-				
-				[ BATTLE_EVENT.CARD_EXPENDED ] = function( self, card, battle )
-                if card ~= self.ignore_card then
-					self:Trigger( battle )
-					end
-				end,
-            },
-        },
-	},
-	
+	},	
 	-- and inflict 1 point of {SURRENDER} 
 -- hit.target:DeltaMorale( (wounding)+(maimed))	
-	
-	lyra_eye_gouge =
-	{
-		name = "Eye Gouge",
-		desc = "Spend 2 {SCARRED}: Apply 2 {IMPAIR}.",
-		anim = "attack",
-		icon = "battle/blasted_eye.tex",
-		flavour = "'You don't wanna see what's next.'",
-		flags = CARD_FLAGS.MELEE,
-		rarity = CARD_RARITY.COMMON,
-		cost = 1,
-	
-		min_damage = 2,
-		max_damage = 5,
-		
-		impair_amount = 2,
-		
-		PreReq = function( self, battle )
-			return self.owner:GetConditionStacks("SCARRED") >= 2
-		end,
-		
-		OnPostResolve = function( self, battle, attack )
-			if self.owner:GetConditionStacks("SCARRED") >= 2 then
-				for i, hit in attack:Hits() do
-					if not hit.evaded then
-						self.owner:RemoveCondition("SCARRED", 2, self)
-							hit.target:AddCondition("IMPAIR", self.impair_amount, self)
-							end
-						end
-					end
-				end
-	},
-	
-	lyra_your_every_move =
-	{
-		name = "Your Every Move",
-		desc = "Gain {ANTICIPATING} equal to damage dealt.",
-		flavour = "'I bet I even know what you'd do once this is over. You won't be doing it, obviously, but still...'",
-		anim = "attack1",
-		icon = "battle/phantom_finisher.tex",
-		flags = CARD_FLAGS.MELEE,
-		rarity = CARD_FLAGS.RARE | CARD_FLAGS.EXPEND,
-		
-		cost = 2,
-		
-		min_damage = 2,
-		max_damage = 4,
-
-		OnPostResolve = function( self, battle, attack, hit )
-				for i, hit in attack:Hits() do
-					if not attack:CheckHitResult( hit.target, "evaded" ) then
-						self.owner:AddCondition("ANTICIPATING", hit.damage or 0, self)
-					end
-				end
-		end
-	},
 	
 	lyra_ending_swing =
     {
 		name = "Ending Swing",
 		desc = "Spend all {SCARRED}. Heal 1 and deal 2 bonus damage per {SCARRED}.",
-		flavour = "'This is what it's been building up to.'",
 		anim = "uppercut",
 		icon = "battle/the_sledge.tex",
 		
@@ -700,33 +329,12 @@ local CARDS =
         },
 	},
 	
-	lyra_strength_from_scars =
-	{
-		name = "Strength From Scars",
-		desc = "Spend all {SCARRED}: Heal 2 for every {SCARRED} spent, gain 1 {POWER} for every {SCARRED} spent.",
-		anim = "taunt",
-		icon = "battle/battle_scars.tex",
-		flavour = "The pain can make you stronger if you just accept it.",
-		rarity = CARD_RARITY.RARE,
-		flags = CARD_FLAGS.EXPEND,
-		cost = 3
-		
-        OnPostResolve = function ( self, battle, attack)
-            if self.owner:HasCondition("SCARRED") then
-                self.owner:HealHealth(self.owner:GetConditionStacks("SCARRED")*2, self)
-				self.owner:AddCondition("POWER", self.owner:GetConditionStacks("SCARRED")/3, self)
-                self.owner:RemoveCondition("SCARRED", self.owner:GetConditionStacks("SCARRED"))
-            end
-        end,
-	},
-	
 	lyra_anticipating_blow =
     {
 		name = "Anticipating Blow",
 		desc = "Gain {ANTICIPATING}.",
 		anim = "uppercut",
 		icon = "battle/stringer.tex",
-		flavour = "'Even when you attack, you've gotta keep an eye out for the enemy's moves.'",
 		
         rarity = CARD_RARITY.UNCOMMON,
 		flags = CARD_FLAGS.MELEE,
@@ -737,26 +345,6 @@ local CARDS =
         
         OnPostResolve = function ( self, battle, attack)
             self.owner:AddCondition("ANTICIPATING", 1, self)
-        end,
-	},
-	
-	lyra_lash_out =
-	{
-		name = "Lash Out",
-		desc = "Gain 2 {DEFENSE} and {2} {RIPOSTE} for each {SCARRED} you have.",
-		anim = "taunt",
-		icon = "battle/wounding_barbs.tex",
-		flavour = "'If hurting people is wrong, why does it make me feel so much better?'",
-		rarity = CARD_RARITY.COMMON,
-		flags = CARD_FLAGS.EXPEND,
-		cost = 1,
-		
-		OnPostResolve = function ( self, battle, attack)
-            if self.owner:HasCondition("SCARRED") then
-			local scarred = self.owner:GetConditionStack( "SCARRED" )
-                self.owner:AddCondition("RIPOSTE", scarred*2, self)
-				self.owner:AddCondition("DEFEND", scarred*2, self)
-            end
         end,
 	},
 }
@@ -790,7 +378,7 @@ local CONDITIONS =
 	ANTICIPATING =
     {
         name = "Anticipating",
-        desc = "Incoming attacks deal 50% less damage and remove 1 point of Anticipating.",
+        desc = "Incoming attacks deal 50% less damage and remove 1 point of Anticipating. Everytime an {ANTICIPATING} stack is removed, gain a buff.",
         icon = "battle/conditions/evasion.tex",
         ctype = CTYPE.BUFF,
         apply_sound = "event:/sfx/battle/status/system/Status_Buff_Defend",
@@ -806,8 +394,8 @@ local CONDITIONS =
                             self.owner:RemoveCondition("ANTICIPATING", 1, self)
 
                             -- add buffs after removing anticipating
-                            --self.owner:AddCondition("POWER", 1, self)
-                            --self.owner:AddCondition("RIPOSTE", 1, self)
+                            self.owner:AddCondition("POWER", 1, self)
+                            self.owner:AddCondition("RIPOSTE", 1, self)
 							-- self.owner:AddCondition("ANTICIPATINGFOLLOWUP", 1, self)
                         end
                     end
@@ -864,41 +452,6 @@ local CONDITIONS =
 		},
 	},
 	
-	    MAIMED =
-    {
-        name = "Maimed",
-        feature_desc = "Gain {1} {MAIMED}.",
-		desc = "Attack damage is decreased by {1}.",
-        desc_fn = function( self, fmt_str, battle )
-            return loc.format(fmt_str, self.stacks )
-        end,
-		
-		apply_sound = "event:/sfx/battle/status/system/Status_Debuff_Fatigue",
-		icon = "battle/conditions/lumin_daze.tex",
-        fx_sound = "event:/sfx/battle/status/system/Status_Debuff_Fatigue",
-        fx_sound_delay = .4,
-        apply_fx = {"power"},
-
-        ctype = CTYPE.DEBUFF,
-		target_type = TARGET_TYPE.SELF,
-        
-		max_stacks = 99,
-        min_stacks = -99,
-
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-                if card.owner == self.owner and card:IsAttackCard() then
-                    dmgt:ModifyDamage( dmgt.min_damage - self.stacks, dmgt.max_damage - self.stacks, self )
-                end
-            end,
-            [ BATTLE_EVENT.BEGIN_TURN ] = function( self, fighter )
-                if self.owner == fighter then
-                    self.owner:RemoveCondition("MAIMED", 1)
-                end
-            end
-        }
-    },
 	-- ANTICIPATINGFOLLOWUP =
 	-- {
 	-- 	name = "(Anticipating) Follow Up",
@@ -918,33 +471,6 @@ local CONDITIONS =
 	-- 	}
 	-- },
 }
-
-local FEATURES =
-{
-	SCARRED = 
-    {
-        name = "Scarred",
-        desc = "Used to activate certain effects. Upon the end of a battle, restore 1 point of health for each point of Scarred.",
-	},
-
-	    MAIMED =
-    {
-        name = "Maimed",
-		desc = "Attack damage is decreased by 1 per stack. 1 stack is removed each turn.",
-	},
-		MAULED =
-	{
-		name = "Mauled",
-		desc = "When this target is attacked, they receive 1 Wound and lose 1 <b>Mauled</b>.",
-	},
-	
-		ANTICIPATING =
-    {
-        name = "Anticipating",
-        desc = "Incoming attacks deal 50% less damage and remove 1 point of Anticipating.",
-	},
-	
-},
 
 for id, def in pairs( CONDITIONS ) do
     Content.AddBattleCondition( id, def )
